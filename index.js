@@ -9,22 +9,25 @@ const wss = new websocket.Server({server: server});
 wss.getUniquID = ()=>{
     id=()=>{
         code = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-        return code + code + '-' + code
+        code1 = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        code2 = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    
+        return code + code1 + '-' + code2
     }
 }
 wss.on("connection", (ws)=>{
-    console.log("A new client connected!!!");
+    ws.id = wss.getUniquID();
+    console.log("New client connected with id: ", ws.id);
     ws.send("Welcome new CLient");
 
     //broadcast i.e send message to other connected clients
-    ws.on("message", (message, isBinary)=>{
-        console.log("Received Message ", message);
+    ws.on("message", (message)=>{
+        console.log(`Client ${ws.id}: ${message}`);
         wss.clients.forEach((client)=>{
             if(client !== ws && client.readyState === websocket.OPEN){
-                client.send(message, {binary: isBinary})
+                client.send(message)
             }
         } )
-        ws.send(`Got your message ${message}`);
     });
 
     ws.onclose= ()=>{
