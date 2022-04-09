@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="./assets/w3.css">
+        <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon">
+        <title>WebSocket Web Client</title>
+    </head>
+    <body>
+        <h1>WebSocket Chat App</h1>
+        <ul class="tsummary">
+            <li>allows two-way, event-driven communication between web browser and server</li>
+            <li>great for <strong>real-time</strong> applications</li>
+            <li>such as </li>
+            <ul>
+                <li>Chatting</li>
+                <li>Multiplayer Gaming</li>
+                <li>Live Feed</li>
+                <li>show Progress or Logging</li>
+            </ul>
+        </ul>
+
+        <pre id="messages" style="width: 90%; margin-left: 5%; height: 200px; overflow: scroll">
+        </pre>
+        <input type="text" id="messageBox" placeholder="Type your message here" 
+            style="display: block; width: 90%; margin-bottom: 10px; margin-left: 5%; padding: 10px;" />
+        <button id="send" title="Send Message!" style="width: 90%; margin-left: 5%; height: 30px;">
+            Send Message
+        </button>
+
+        <script>
+            if ("WebSocket" in window){
+                const sendBtn = document.querySelector('#send');
+                const messages = document.querySelector('#messages');
+                const messageBox = document.querySelector('#messageBox');
+
+                //displays the message on the screen(testArea)
+                //and clears the textBox.
+                showMessage= (message)=>{
+                    messages.textContent = `\n ${message}`;
+                    messages.scrollTop = messages.scrollHeight
+                    messageBox.value= '';
+                }
+
+                let ws = new WebSocket('ws://localhost:3000');
+
+                //connection opened
+                ws.onopen = ()=>{
+                    console.log("Connected to Server");
+                };
+
+                sendBtn.onclick = ()=>{
+                    if(ws){
+                        ws.send(messageBox.value);
+                        //replace ME with my ID
+                        showMessage(`ME ${messageBox.value}`);
+                    }else {
+                        alert('ERROR: Not COnnected... refresh to try again');
+                    }
+                }
+
+                //Listen for messages
+                ws.onmessage = ({data})=>{
+                    //replace incoming with sender ID
+                    showMessage(`Incoming: ${data}`);
+                }
+
+                ws.onclose =()=>{
+                    //put client ID to indicate who disconnected.
+                    console.log("Client Disconnected");
+                    alert("Connection closed... refresh to try again");
+                }
+
+
+            }else {
+                alert("WebSocket Not supported on your Browser!!");
+            }
+        </script>
+    </body>
+</html>
+

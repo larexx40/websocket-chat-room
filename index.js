@@ -1,22 +1,32 @@
 const express = require('express')
 const websocket = require('ws');
 const http = require('http');
+const path = require('path');
 
 const app = express()
+
+// view engine setup
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 const server = http.createServer(app);
 const wss = new websocket.Server({server: server});
 
-wss.getUniquID = ()=>{
-    id=()=>{
-        code = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-        code1 = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-        code2 = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    
-        return code + code1 + '-' + code2
-    }
+wss.getUniqueID= ()=>{
+        num = Math.floor((1 + Math.random()) * 0x1000).toString().substring(1);
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        var charactersLength = characters.length;
+        for ( var i = 0; i <=3; i++ ) {
+          result += characters.charAt(Math.floor(Math.random() * charactersLength));
+       }
+       return result + num;
 }
+
 wss.on("connection", (ws)=>{
-    ws.id = wss.getUniquID();
+    ws.id = wss.getUniqueID();
     console.log("New client connected with id: ", ws.id);
     ws.send("Welcome new CLient");
 
@@ -39,7 +49,7 @@ wss.on("connection", (ws)=>{
 
 app.get('/' , (req , res)=>{
 
-   res.send('hello from simple server :)')
+   res.render('index.ejs');
 
 })
 

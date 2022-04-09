@@ -11,6 +11,7 @@
   "author": "R. O. Olatunji",
   "license": "ISC",
   "dependencies": {
+    "ejs": "^3.1.6",
     "express": "^4.17.3",
     "nodemon": "^2.0.15",
     "ws": "^8.5.0"

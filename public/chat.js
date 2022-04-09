@@ -1,23 +1,49 @@
 $(function (){
-    const clientID ='';
+    if ("WebSocket" in window){
+        const sendBtn = document.querySelector('#send');
+        const messages = document.querySelector('#messages');
+        const messageBox = document.querySelector('#messageBox');
 
-    let wsClient = new WebSocket('ws://localhost:3000');
+        //displays the message on the screen(testArea)
+        //and clears the textBox.
+        showMessage= (message)=>{
+            messages.textContent = `\n ${message}`;
+            messages.scrollTop = messages.scrollHeight
+            messageBox.value= '';
+        }
 
-    //connection opened
-    wsClient.onopen = ()=>{
-        console.log("Connected to Server");
-    }
+        let ws = new WebSocket('ws://localhost:3000');
 
-    //send message to server
-    wsClient.send(messageBox.value);
+        //connection opened
+        ws.onopen = ()=>{
+            console.log("Connected to Server");
+        };
 
-    //Listen for messages
-    wsClient.onmessage = ({data})=>{
-        showMessage(`Incoming: ${data}`);
-    }
+        sendBtn.onclick = ()=>{
+            if(ws){
+                ws.send(messageBox.value);
+                //replace ME with my ID
+                showMessage(`ME ${messageBox.value}`);
+            }else {
+                alert('ERROR: Not COnnected... refresh to try again');
+            }
+        }
 
-    wsClient.onclose =()=>{
-        console.log("Client Disconnected");
+        //Listen for messages
+        ws.onmessage = ({data})=>{
+            //replace incoming with sender ID
+            showMessage(`Incoming: ${data}`);
+        }
+
+        ws.onclose =()=>{
+            //put client ID to indicate who disconnected.
+            console.log("Client Disconnected");
+            alert("Connection closed... refresh to try again");
+        }
+
+
+    }else {
+        alert("WebSocket Not supported on your Browser!!");
     }
 
 })
